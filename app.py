@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request
-from openai import OpenAI
+import openai
 
 app = Flask(__name__)
 
@@ -8,7 +8,8 @@ app = Flask(__name__)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN", "my_verify_token")
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+# Set API key properly
+openai.api_key = OPENAI_API_KEY
 
 SYSTEM_PROMPT = """
 You are an AI assistant for a landscaping company.
@@ -40,7 +41,7 @@ def webhook():
     # For now just test OpenAI call
     test_message = "Customer wants lawn mowing quote"
 
-    response = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -54,6 +55,6 @@ def webhook():
     return "OK", 200
 
 if __name__ == "__main__":
-    # Use Render's dynamic port if provided
+    # Use Render's dynamic port
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
